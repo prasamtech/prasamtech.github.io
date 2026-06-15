@@ -22,10 +22,35 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    contactForm.addEventListener('submit', (e) => {
+    contactForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        alert('Thank you for your message! We will get back to you soon.');
-        contactForm.reset();
+        const formData = new FormData(contactForm);
+        const button = contactForm.querySelector('button');
+        const originalText = button.textContent;
+        button.textContent = 'Sending...';
+        button.disabled = true;
+
+        try {
+            const response = await fetch(contactForm.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                alert('Thank you for your message! We will get back to you soon.');
+                contactForm.reset();
+            } else {
+                alert('Oops, there was a problem sending your message. Please try again.');
+            }
+        } catch (error) {
+            alert('Oops, there was a problem sending your message. Please try again.');
+        } finally {
+            button.textContent = originalText;
+            button.disabled = false;
+        }
     });
 
     const observerOptions = {
